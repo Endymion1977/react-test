@@ -3,6 +3,7 @@ import { Header, Message, Table } from 'semantic-ui-react';
 import { withAuth } from '@okta/okta-react';
 
 import { API_BASE_URL } from './config'
+import IncreaseCountButton from './IncreaseCountButton';
 import MovieForm from './MovieForm';
 
 export default withAuth(class Movies extends Component {
@@ -14,6 +15,7 @@ export default withAuth(class Movies extends Component {
             isLoading: null
         };
         this.onAddition = this.onAddition.bind(this);
+        this.onIncrease = this.onIncrease.bind(this);
     }
 
     componentDidMount() {
@@ -45,6 +47,15 @@ export default withAuth(class Movies extends Component {
         })
     }
 
+    onIncrease(data, id) {
+        let movies = this.state.movies;
+        let movie = movies.find(movie => movie.id === id);
+        movie.count = data.count;
+        this.setState({
+            movies: movies
+        })
+    }
+
     render() {
         return (
             <div>
@@ -68,7 +79,9 @@ export default withAuth(class Movies extends Component {
                                             <td>{movie.id}</td>
                                             <td>{movie.title}</td>
                                             <td>{movie.count}</td>
-                                            <td>actions</td>
+                                            <td>
+                                                <IncreaseCountButton onIncrease={this.onIncrease} movieId={movie.id} />
+                                            </td>
                                         </tr>
                             )}
                             </tbody>
