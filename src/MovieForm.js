@@ -52,6 +52,7 @@ export default withAuth(class MovieForm extends Component {
             });
         } else {
             this.setState({
+                title: '',
                 isLoading: false,
                 error: false,
                 errorMessage: ''
