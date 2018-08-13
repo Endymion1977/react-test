@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
-import { withAuth } from '@okta/okta-react';
 import { Header, Message, Table } from 'semantic-ui-react';
+import { withAuth } from '@okta/okta-react';
+
+import { API_BASE_URL } from './config'
+import MovieForm from './MovieForm';
 
 export default withAuth(class Movies extends Component {
 
     constructor(props) {
         super(props);
-        this.API_BASE_URL = 'http://localhost:8000';
-        this.state = { movies: null, loading: null };
+        this.state = {
+            movies: null,
+            isLoading: null
+        };
+        this.onAddition = this.onAddition.bind(this);
     }
 
     componentDidMount() {
@@ -17,27 +23,33 @@ export default withAuth(class Movies extends Component {
     async getMovies() {
         if (!this.state.movies) {
             try {
-                this.setState({ loading: true });
+                this.setState({ isLoading: true });
                 const accessToken = await this.props.auth.getAccessToken();
-                const response = await fetch(this.API_BASE_URL + '/movies', {
+                const response = await fetch(API_BASE_URL + '/movies', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
                 const data = await response.json();
-                this.setState({ movies: data, loading: false});
+                this.setState({ movies: data, isLoading: false});
             } catch (err) {
-                this.setState({ loading: false });
+                this.setState({ isLoading: false });
                 console.error(err);
             }
         }
+    }
+
+    onAddition(movie) {
+        this.setState({
+            movies: [...this.state.movies, movie]
+        })
     }
 
     render() {
         return (
             <div>
                 <Header as="h1">My Movies</Header>
-                {this.state.loading === true && <Message info header="Loading movies..." />}
+                {this.state.isLoading && <Message info header="Loading movies..." />}
                 {this.state.movies &&
                     <div>
                         <Table>
@@ -61,6 +73,7 @@ export default withAuth(class Movies extends Component {
                             )}
                             </tbody>
                         </Table>
+                        <MovieForm onAddition={this.onAddition} />
                     </div>
                 }
             </div>
